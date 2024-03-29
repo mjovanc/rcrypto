@@ -1,5 +1,6 @@
+use std::string::FromUtf8Error;
 use aes_gcm::aead::OsRng;
-use aes_gcm::{Aes256Gcm, Error, KeyInit};
+use aes_gcm::{AeadCore, Aes256Gcm, Error, KeyInit};
 use crate::encryption::{decrypt_aes256, encrypt_aes256};
 
 mod encryption;
@@ -7,8 +8,9 @@ mod encryption;
 fn main() {
     // Generate a random encryption key
     let key = Aes256Gcm::generate_key(OsRng);
+    let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
 
-    let cipher_text = match encrypt_aes256(key) {
+    let cipher = match encrypt_aes256(&key, &nonce) {
         Ok(cipher_text) => cipher_text,
         Err(err) => {
             eprintln!("Error encrypting using AES-256, {}", err);
@@ -16,9 +18,9 @@ fn main() {
         }
     };
 
-    println!("Cipher text: {:?}", cipher_text);
+    println!("Cipher text: {:?}", cipher);
 
-    let plaintext = match decrypt_aes256(key, cipher_text) {
+    let plaintext_bytes = match decrypt_aes256(&key, &nonce, cipher) {
         Ok(plaintext) => plaintext,
         Err(err) => {
             eprintln!("Error decrypting using AES-256, {}", err);
@@ -26,5 +28,13 @@ fn main() {
         }
     };
 
-    println!("Plaintext: {:?}", plaintext);
+    println!("Plaintext (bytes): {:?}", plaintext_bytes);
+
+    match String::from_utf8(plaintext_bytes) {
+        Ok(str) => println!("Plaintext: {:?}", str),
+        Err(err) => {
+            eprintln!("Error converting bytes array to String, {}", err);
+            return;
+        }
+    }
 }
