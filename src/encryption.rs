@@ -27,7 +27,7 @@ pub fn decrypt_aes256(
 }
 
 #[test]
-fn encrypt_and_decrypt_test() {
+fn aes_encrypt_and_decrypt_test() {
     let key = Aes256Gcm::generate_key(OsRng);
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
     let text = b"Some text to be encrypted...".as_ref();
@@ -42,4 +42,16 @@ fn encrypt_and_decrypt_test() {
     let initial_str = String::from(text_str);
     let result_str = String::from_utf8(plaintext_bytes).unwrap();
     assert_eq!(initial_str, result_str);
+}
+
+#[test]
+fn aes_empty_input_test() {
+    let key = Aes256Gcm::generate_key(OsRng);
+    let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+
+    // Test encrypting and decrypting an empty input
+    let cipher = encrypt_aes256(&key, &nonce, &[]).unwrap();
+    let decrypted_text = decrypt_aes256(&key, &nonce, cipher).unwrap();
+
+    assert!(decrypted_text.is_empty());
 }

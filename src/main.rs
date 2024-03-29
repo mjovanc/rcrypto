@@ -3,6 +3,7 @@ use aes_gcm::{AeadCore, Aes256Gcm, KeyInit};
 use crate::encryption::{decrypt_aes256, encrypt_aes256};
 
 mod encryption;
+mod hashing;
 
 fn main() {
     // Generate a random encryption key
