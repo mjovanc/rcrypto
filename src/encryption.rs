@@ -1,7 +1,10 @@
-use aes_gcm::{aead::{Aead, KeyInit}, AeadCore, Aes256Gcm, AesGcm, Key};
 use aes_gcm::aead::consts::U12;
 use aes_gcm::aead::{Nonce, OsRng};
 use aes_gcm::aes::Aes256;
+use aes_gcm::{
+    aead::{Aead, KeyInit},
+    AeadCore, Aes256Gcm, AesGcm, Key,
+};
 use std::str;
 
 pub fn encrypt_aes256(
@@ -18,8 +21,8 @@ pub fn encrypt_aes256(
 pub fn decrypt_aes256(
     key: &Key<AesGcm<Aes256, U12>>,
     nonce: &Nonce<AesGcm<Aes256, U12>>,
-    cipher: Vec<u8>
-) -> Result<Vec<u8>, aes_gcm::Error>  {
+    cipher: Vec<u8>,
+) -> Result<Vec<u8>, aes_gcm::Error> {
     let cipher_inst = Aes256Gcm::new(&key);
     let plaintext = cipher_inst.decrypt(&nonce, cipher.as_ref())?;
 
